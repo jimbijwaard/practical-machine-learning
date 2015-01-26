@@ -25,14 +25,9 @@ inTrain = createDataPartition(y=data_train$classe, p=0.7, list=F)
 training = data_train[inTrain,]
 testing  = data_train[-inTrain,]
 
-# GBM model
-GBM = train(classe ~ ., method="gbm",data=training,verbose=FALSE)
-# RF model
-RF = train(as.factor(classe) ~ ., method="rf",data=training)
 
-predictGBM = predict(GBM, testing)
-confusionMatrix(testing$classe, predictGBM)
-predictGBM_ans = predict(GBM, data_test)
+# RF model, with tuning parameters to speed up training the model
+RF = train(y=training$classe, x=training[,-30], method="rf", tuneGrid = data.frame(mtry = 2), ntree=50)
 
 predictRF = predict(RF, testing)
 confusionMatrix(testing$classe, predictRF)
@@ -48,3 +43,9 @@ pml_write_files = function(x){
 }
 
 pml_write_files(predictRF_ans)
+
+
+# GBM model
+# GBM = train(y=training$classe, x=training[,-30], method="gbm", verbose=FALSE)predictGBM = predict(GBM, testing)
+# confusionMatrix(testing$classe, predictGBM)
+# predictGBM_ans = predict(GBM, data_test)
