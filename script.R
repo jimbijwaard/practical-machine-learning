@@ -38,8 +38,7 @@ predictRF = predict(RF, testing)
 confusionMatrix(testing$classe, predictRF)
 predictRF_ans = predict(RF, data_test)
 
-# answers = c("A","B","C","C","C","A","B","B","C","A","A","B","C","E","E","A","E","C","D","E")
-# 
+ 
 # pml_write_files = function(x){
 #   n = length(x)
 #   for(i in 1:n){
