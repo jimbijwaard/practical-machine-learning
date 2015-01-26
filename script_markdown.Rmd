@@ -62,49 +62,35 @@ testing  = data_train[-inTrain,]
 
 ```
 
-Preprocess the data in order to speed up random forest training
-
-```{r}
-
-preProc = preProcess(training[, -30], method="pca", pcaComp=10)
-trainPreProcess = predict(preProc, training[, -30])
-
-```
-Build a random forest model
-```{r}
-
-# Random Forest model
-RF = train(as.factor(training$classe) ~ ., data=trainPreProcess, method="rf")
-summary(RF)
-
-```
-Apply the preprocessing to the testing data and predict testing values
-```{r}
-
-testPreProcess = predict(preProc, testing[, -30])
-predictRF = predict(RF, testPreProcess)
-
-```
-Validate the model with confusionmatrix
-```{r}
-
-confusionMatrix(testing$classe, predictRF)
-
-```
-Also apply a GBM model, for fun
+Build a GBM and an RF model to compare performance, and apply the best to the test data
 
 ```{r}
 
 # GBM model
-GBM = train(as.factor(classe) ~ ., method="gbm",data=training,verbose=FALSE)
+# GBM = train(as.factor(classe) ~ ., method="gbm",data=training,verbose=FALSE)
+# RF model
+# RF = train(as.factor(classe) ~ ., method="gbm",data=training)
 
 predictGBM = predict(GBM, testing)
-
 confusionMatrix(testing$classe, predictGBM)
+predictGBM_ans = predict(GBM, data_test)
 
-predictGBM = predict(GBM, data_test)
-
-
+predictRF = predict(RF, testing)
+confusionMatrix(testing$classe, predictRF)
+predictRF_ans = predict(RF, data_test)
 
 ```
 
+Write the preditions to files
+
+```{r}
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+
+pml_write_files(predictRF_ans)
+```
