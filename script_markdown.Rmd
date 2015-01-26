@@ -1,39 +1,100 @@
+---
+title: "Practical Machine Learning"
+author: "Jim Bijwaard"
+date: "26 Jan 2015wk5"
+output: html_document
+---
+
+Code for the practical machine learning course.
+
+Load all necessary libaries
+
+```{r}
+
 library(caret)
 library(randomForest)
+
+```
+
+load the data and replace all empty, NA and #DIV/0! content with NA values
+
+```{r}
 
 # load data without setting strings to factor values
 df_train = read.csv('pml-training.csv', na.strings=c("NA","#DIV/0!",""))
 df_test = read.csv('pml-testing.csv', na.strings=c("NA","#DIV/0!",""))
 
+```
+
+Check the structure of the data sets
+
+```{r}
+
 str(df_train)
 str(df_test)
+
+```
+
+The test data sets has many columns that only contain NA values. By removing these from the data sets, everything will be much faster (although noted: not future prove when more data is available)
+
+```{r}
 
 # limit the  variables to those that are not completely empty (NA) in the testing set
 dependent_vars = c("roll_belt", "pitch_belt", "yaw_belt", "total_accel_belt", "gyros_belt_x", "gyros_belt_y", "gyros_belt_z", "accel_belt_x", "accel_belt_y", "accel_belt_z", "magnet_belt_x", "magnet_belt_y", "magnet_belt_z", "roll_arm", "pitch_arm", "yaw_arm", "total_accel_arm", "gyros_arm_x", "gyros_arm_y", "gyros_arm_z", "accel_arm_x", "accel_arm_y", "accel_arm_z", "magnet_arm_x", "magnet_arm_y", "magnet_arm_z", "roll_dumbbell", "pitch_dumbbell", "yaw_dumbbell")
 all_vars_train = c("roll_belt", "pitch_belt", "yaw_belt", "total_accel_belt", "gyros_belt_x", "gyros_belt_y", "gyros_belt_z", "accel_belt_x", "accel_belt_y", "accel_belt_z", "magnet_belt_x", "magnet_belt_y", "magnet_belt_z", "roll_arm", "pitch_arm", "yaw_arm", "total_accel_arm", "gyros_arm_x", "gyros_arm_y", "gyros_arm_z", "accel_arm_x", "accel_arm_y", "accel_arm_z", "magnet_arm_x", "magnet_arm_y", "magnet_arm_z", "roll_dumbbell", "pitch_dumbbell", "yaw_dumbbell", "classe")
 all_vars_test = c("roll_belt", "pitch_belt", "yaw_belt", "total_accel_belt", "gyros_belt_x", "gyros_belt_y", "gyros_belt_z", "accel_belt_x", "accel_belt_y", "accel_belt_z", "magnet_belt_x", "magnet_belt_y", "magnet_belt_z", "roll_arm", "pitch_arm", "yaw_arm", "total_accel_arm", "gyros_arm_x", "gyros_arm_y", "gyros_arm_z", "accel_arm_x", "accel_arm_y", "accel_arm_z", "magnet_arm_x", "magnet_arm_y", "magnet_arm_z", "roll_dumbbell", "pitch_dumbbell", "yaw_dumbbell", "problem_id")
 
-# keep only the vars we want to keep
+```
+Keep only the vars we want to keep
+```{r}
 # data_train = df_train[,(names(df_train) %in% all_vars_train)]
 # data_test = df_test[,(names(df_test) %in% all_vars_test)]
 # more elegant method
 data_train = subset(df_train, select=all_vars_train)
 data_test = subset(df_test, select=all_vars_test)
 
-#Split train data in a training set and a testing set for model validation
+```
+Split train and test data set for model validation
+```{r}
 inTrain = createDataPartition(y=data_train$classe, p=0.7, list=F)
 training = data_train[inTrain,]
 testing  = data_train[-inTrain,]
 
+```
+
+Preprocess the data in order to speed up random forest training
+
+```{r}
+
 preProc = preProcess(training[, -30], method="pca", pcaComp=10)
 trainPreProcess = predict(preProc, training[, -30])
+
+```
+Build a random forest model
+```{r}
 
 # Random Forest model
 RF = train(as.factor(training$classe) ~ ., data=trainPreProcess, method="rf")
 summary(RF)
 
+```
+Apply the preprocessing to the testing data and predict testing values
+```{r}
+
 testPreProcess = predict(preProc, testing[, -30])
 predictRF = predict(RF, testPreProcess)
 
+```
+Validate the model with confusionmatrix
+```{r}
+
 confusionMatrix(testing$classe, predictRF)
+
+```
+Apply the method to the test data and predict the classe
+```{r}
+
+
+
+```
 
