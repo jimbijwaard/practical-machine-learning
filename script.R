@@ -25,15 +25,12 @@ inTrain = createDataPartition(y=data_train$classe, p=0.7, list=F)
 training = data_train[inTrain,]
 testing  = data_train[-inTrain,]
 
-preProc = preProcess(training[, -30], method="pca", pcaComp=10)
-trainPreProcess = predict(preProc, training[, -30])
+# GBM model
+GBM = train(as.factor(classe) ~ ., method="gbm",data=training,verbose=FALSE)
 
-# Random Forest model
-RF = train(as.factor(training$classe) ~ ., data=trainPreProcess, method="rf")
-summary(RF)
+predictGBM = predict(GBM, testing)
 
-testPreProcess = predict(preProc, testing[, -30])
-predictRF = predict(RF, testPreProcess)
+confusionMatrix(testing$classe, predictGBM)
 
-confusionMatrix(testing$classe, predictRF)
+predictGBM = predict(GBM, data_test)
 

@@ -91,8 +91,18 @@ Validate the model with confusionmatrix
 confusionMatrix(testing$classe, predictRF)
 
 ```
-Apply the method to the test data and predict the classe
+Also apply a GBM model, for fun
+
 ```{r}
+
+# GBM model
+GBM = train(as.factor(classe) ~ ., method="gbm",data=training,verbose=FALSE)
+
+predictGBM = predict(GBM, testing)
+
+confusionMatrix(testing$classe, predictGBM)
+
+predictGBM = predict(GBM, data_test)
 
 
 
