@@ -66,18 +66,17 @@ Build a GBM and an RF model to compare performance, and apply the best to the te
 
 ```{r}
 
-# GBM model
-# GBM = train(as.factor(classe) ~ ., method="gbm",data=training,verbose=FALSE)
-# RF model
-# RF = train(as.factor(classe) ~ ., method="gbm",data=training)
-
-predictGBM = predict(GBM, testing)
-confusionMatrix(testing$classe, predictGBM)
-predictGBM_ans = predict(GBM, data_test)
+# RF model, with tuning parameters to speed up training the model
+RF = train(y=training$classe, x=training[,-30], method="rf", tuneGrid = data.frame(mtry = 2), ntree=50)
 
 predictRF = predict(RF, testing)
 confusionMatrix(testing$classe, predictRF)
 predictRF_ans = predict(RF, data_test)
+
+# GBM model; commented out for speed
+# GBM = train(y=training$classe, x=training[,-30], method="gbm", verbose=FALSE)predictGBM = predict(GBM, testing)
+# confusionMatrix(testing$classe, predictGBM)
+# predictGBM_ans = predict(GBM, data_test)
 
 ```
 

@@ -26,9 +26,9 @@ training = data_train[inTrain,]
 testing  = data_train[-inTrain,]
 
 # GBM model
-GBM = train(as.factor(classe) ~ ., method="gbm",data=training,verbose=FALSE)
+GBM = train(classe ~ ., method="gbm",data=training,verbose=FALSE)
 # RF model
-RF = train(as.factor(classe) ~ ., method="gbm",data=training)
+RF = train(as.factor(classe) ~ ., method="rf",data=training)
 
 predictGBM = predict(GBM, testing)
 confusionMatrix(testing$classe, predictGBM)
@@ -38,13 +38,13 @@ predictRF = predict(RF, testing)
 confusionMatrix(testing$classe, predictRF)
 predictRF_ans = predict(RF, data_test)
 
- 
-# pml_write_files = function(x){
-#   n = length(x)
-#   for(i in 1:n){
-#     filename = paste0("problem_id_",i,".txt")
-#     write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
-#   }
-# }
-# 
-# pml_write_files(answers)
+
+pml_write_files = function(x){
+  n = length(x)
+  for(i in 1:n){
+    filename = paste0("problem_id_",i,".txt")
+    write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+  }
+}
+
+pml_write_files(predictRF_ans)
