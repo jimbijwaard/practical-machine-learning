@@ -27,10 +27,25 @@ testing  = data_train[-inTrain,]
 
 # GBM model
 GBM = train(as.factor(classe) ~ ., method="gbm",data=training,verbose=FALSE)
+# RF model
+RF = train(as.factor(classe) ~ ., method="gbm",data=training)
 
 predictGBM = predict(GBM, testing)
-
 confusionMatrix(testing$classe, predictGBM)
+predictGBM_ans = predict(GBM, data_test)
 
-predictGBM = predict(GBM, data_test)
+predictRF = predict(RF, testing)
+confusionMatrix(testing$classe, predictRF)
+predictRF_ans = predict(RF, data_test)
 
+# answers = c("A","B","C","C","C","A","B","B","C","A","A","B","C","E","E","A","E","C","D","E")
+# 
+# pml_write_files = function(x){
+#   n = length(x)
+#   for(i in 1:n){
+#     filename = paste0("problem_id_",i,".txt")
+#     write.table(x[i],file=filename,quote=FALSE,row.names=FALSE,col.names=FALSE)
+#   }
+# }
+# 
+# pml_write_files(answers)
